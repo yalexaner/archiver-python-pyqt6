@@ -1,5 +1,6 @@
 import os
 import sys
+import zipfile
 
 from PyQt6.QtCore import QObject, pyqtSlot
 from PyQt6.QtQml import QQmlApplicationEngine
@@ -11,8 +12,16 @@ class Backend(QObject):
     def open_file_dialog(self):
         file_dialog = QFileDialog()
         file_path, _ = file_dialog.getOpenFileName(None, "Select File", "", "All Files (*)")
-        print(file_path)
         return file_path
+
+    @pyqtSlot(str)
+    def archive_file(self, file_path):
+        if file_path:
+            zip_file_path = os.path.splitext(file_path)[0] + ".zip"
+            with zipfile.ZipFile(zip_file_path, "w") as zip_file:
+                zip_file.write(file_path, os.path.basename(file_path))
+            return zip_file_path
+        return ""
 
 
 if __name__ == '__main__':

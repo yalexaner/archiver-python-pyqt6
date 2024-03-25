@@ -6,7 +6,7 @@ Window {
     width: 640
     height: 480
     visible: true
-    title: qsTr("File Selector")
+    title: qsTr("File Archiver")
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -18,14 +18,24 @@ Window {
             font.pixelSize: 16
         }
 
+        Text {
+            id: archivedFileText
+            text: ""
+            font.pixelSize: 16
+            color: "green"
+        }
+
         Button {
             text: "Select File"
             onClicked: {
-                var filePath = backend.open_file_dialog()
+                const filePath = backend.open_file_dialog();
                 if (filePath) {
                     selectedFileText.text = "Selected file: " + filePath
+                    const archivedFilePath = backend.archive_file(filePath);
+                    archivedFileText.text = "Archived file: " + archivedFilePath
                 } else {
                     selectedFileText.text = "No file selected"
+                    archivedFileText.text = ""
                 }
             }
         }
