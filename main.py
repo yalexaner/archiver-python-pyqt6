@@ -19,7 +19,8 @@ class Backend(QObject):
         if file_path:
             zip_file_path = os.path.splitext(file_path)[0] + ".zip"
             with zipfile.ZipFile(zip_file_path, "w") as zip_file:
-                zip_file.write(file_path, os.path.basename(file_path))
+                filename = os.path.basename(file_path)
+                zip_file.write(file_path, arcname=filename)
             return zip_file_path
         return ""
 
