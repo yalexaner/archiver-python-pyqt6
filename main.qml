@@ -39,5 +39,18 @@ Window {
                 }
             }
         }
+
+        Button {
+            text: "Select Directory"
+            onClicked: {
+                const dirPath = backend.open_dir_dialog();
+                if (dirPath) {
+                    const archivedFilePath = backend.archive_directory(dirPath);
+                    archivedFileText.text = "Archived directory: " + archivedFilePath;
+                } else {
+                    archivedFileText.text = "";
+                }
+            }
+        }
     }
 }
