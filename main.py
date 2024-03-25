@@ -2,16 +2,22 @@ import os
 import sys
 import zipfile
 
-from PyQt6.QtCore import QObject, pyqtSlot
+from PyQt6.QtCore import QObject, pyqtSlot, pyqtSignal
 from PyQt6.QtQml import QQmlApplicationEngine
 from PyQt6.QtWidgets import QApplication, QFileDialog
 
+selectedFiles = []
+
 
 class Backend(QObject):
+    selectedFilesChanged = pyqtSignal(list)
+
     @pyqtSlot(result=str)
     def open_file_dialog(self):
         file_dialog = QFileDialog()
         file_path, _ = file_dialog.getOpenFileName(None, "Select File", "", "All Files (*)")
+        selectedFiles.append(file_path)
+        self.selectedFilesChanged.emit(selectedFiles)
         return file_path
 
     @pyqtSlot(result=str)
@@ -22,17 +28,14 @@ class Backend(QObject):
         dir_dialog.setOption(QFileDialog.Option.ReadOnly, True)
 
         dir_path = dir_dialog.getExistingDirectory(None, "Select Directory")
+        selectedFiles.append(dir_path)
+        self.selectedFilesChanged.emit(selectedFiles)
         return dir_path
 
-    @pyqtSlot(str)
-    def archive_file(self, file_path):
-        if file_path:
-            zip_file_path = os.path.splitext(file_path)[0] + ".zip"
-            with zipfile.ZipFile(zip_file_path, "w") as zip_file:
-                filename = os.path.basename(file_path)
-                zip_file.write(file_path, arcname=filename)
-            return zip_file_path
-        return ""
+    @pyqtSlot()
+    def clear(self):
+        selectedFiles.clear()
+        self.selectedFilesChanged.emit(selectedFiles)
 
     @pyqtSlot(str)
     def archive_directory(self, dir_path):
