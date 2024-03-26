@@ -9,6 +9,8 @@ Window {
     title: qsTr("File Archiver")
 
     property var selectedFiles: []
+    property var archiveProgress: 0
+    property var archiveFileName: ""
 
     Connections {
         target: backend
@@ -17,6 +19,21 @@ Window {
         function onSelectedFilesChanged(files) {
             // noinspection JSUndeclaredVariable
             selectedFiles = files
+
+            // noinspection JSUndeclaredVariable
+            archiveProgress = 0
+        }
+
+        // noinspection JSUnusedGlobalSymbols
+        function onArchiveProgress(progress) {
+            // noinspection JSUndeclaredVariable
+            archiveProgress = progress
+        }
+
+        // noinspection JSUnusedGlobalSymbols
+        function onArchiveFileName(fileName) {
+            // noinspection JSUndeclaredVariable
+            archiveFileName = fileName
         }
     }
 
@@ -154,5 +171,30 @@ Window {
         onClicked: {
             backend.clear();
         }
+    }
+
+    Text {
+        id: archiveProgressText
+        anchors.bottom: progressBar.top
+        anchors.left: parent.left
+        anchors.bottomMargin: 8
+        anchors.leftMargin: 8
+        text: (archiveProgress === 100) ? "Done! Created file " + archiveFileName : "Progress: " + archiveProgress.toFixed(2) + "%"
+        font.pixelSize: 16
+        visible: archiveProgress > 0
+    }
+
+    ProgressBar {
+        id: progressBar
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottomMargin: 8
+        anchors.leftMargin: 8
+        anchors.rightMargin: 8
+        width: parent.width
+        height: 20
+        to: 100
+        value: archiveProgress
     }
 }

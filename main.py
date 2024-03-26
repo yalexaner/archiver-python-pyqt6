@@ -15,6 +15,9 @@ class Backend(QObject):
     selectedPaths = []
     selectedFilesChanged = pyqtSignal(list)
 
+    archiveProgress = pyqtSignal(float)
+    archiveFileName = pyqtSignal(str)
+
     @pyqtSlot()
     def open_file_dialog(self):
         dialog = QFileDialog()
@@ -53,7 +56,9 @@ class Backend(QObject):
     @pyqtSlot()
     def archive_files(self):
         zip_file_path = f"archive-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.zip"
-        worker = ArchiverWorker(zip_file_path, self.selectedPaths)
+        self.archiveFileName.emit(zip_file_path)
+
+        worker = ArchiverWorker(zip_file_path, self.selectedPaths, self.archiveProgress)
         self.threadpool.start(worker)
 
 
