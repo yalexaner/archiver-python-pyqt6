@@ -5,6 +5,10 @@ import QtQuick.Layouts
 Window {
     width: 640
     height: 480
+    minimumWidth: 640
+    maximumWidth: 640
+    minimumHeight: 480
+    maximumHeight: 480
     visible: true
     title: qsTr("File Archiver")
 
