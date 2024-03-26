@@ -133,7 +133,7 @@ Window {
         icon.color: "green"
         enabled: selectedFiles.length > 0
         onClicked: {
-            backend.archiveFiles();
+            backend.archive_files();
         }
     }
 
