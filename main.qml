@@ -143,12 +143,10 @@ Window {
         anchors.right: selectedFilesField.right
         flat: true
         spacing: 1
-        // radius: 14
         font.pixelSize: 12
         anchors.rightMargin: 8
-        anchors.topMargin: 2
-        hoverEnabled: true
-        text: "clear"
+        anchors.topMargin: 4
+        text: "CLEAR"
         icon.source: "icons/clear.svg"
         icon.color: "red"
         icon.height: 16
