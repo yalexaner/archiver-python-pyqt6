@@ -2,22 +2,21 @@ import os
 import sys
 from datetime import datetime
 
-from PyQt6.QtCore import QObject, pyqtSlot, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSlot, pyqtSignal, QThreadPool
 from PyQt6.QtQml import QQmlApplicationEngine
 from PyQt6.QtWidgets import QApplication, QFileDialog
 
-from archiver.archiver import archive_file, archive_directory
-
-selectedPaths = []
+from archiver.archive_worker import ArchiverWorker
 
 
 class Backend(QObject):
+    threadpool = QThreadPool()
+
+    selectedPaths = []
     selectedFilesChanged = pyqtSignal(list)
 
     @pyqtSlot()
     def open_file_dialog(self):
-        global selectedPaths
-
         dialog = QFileDialog()
         dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
         dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
@@ -25,15 +24,13 @@ class Backend(QObject):
 
         paths, _ = dialog.getOpenFileNames(None, "Select File", "", "All Files (*)")
         for path in paths:
-            if path not in selectedPaths:
-                selectedPaths.append(path)
+            if path not in self.selectedPaths:
+                self.selectedPaths.append(path)
 
-        self.selectedFilesChanged.emit(selectedPaths)
+        self.selectedFilesChanged.emit(self.selectedPaths)
 
     @pyqtSlot()
     def open_dir_dialog(self):
-        global selectedPaths
-
         dialog = QFileDialog()
         dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
         dialog.setFileMode(QFileDialog.FileMode.Directory)
@@ -42,26 +39,22 @@ class Backend(QObject):
         dialog.setOption(QFileDialog.Option.ReadOnly, True)
 
         path = dialog.getExistingDirectory(None, "Select Directory")
-        if path not in selectedPaths:
-            selectedPaths.append(path)
+        if path not in self.selectedPaths:
+            self.selectedPaths.append(path)
 
-        self.selectedFilesChanged.emit(selectedPaths)
+        self.selectedFilesChanged.emit(self.selectedPaths)
 
     @pyqtSlot()
     def clear(self):
-        selectedPaths.clear()
-        self.selectedFilesChanged.emit(selectedPaths)
+        self.selectedPaths.clear()
+        self.selectedFilesChanged.emit(self.selectedPaths)
 
+    # noinspection PyUnresolvedReferences
     @pyqtSlot()
     def archive_files(self):
-        # generate archive name with current date and time
         zip_file_path = f"archive-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.zip"
-
-        for file in selectedPaths:
-            if os.path.isfile(file):
-                archive_file(zip_file_path, file)
-            else:
-                archive_directory(zip_file_path, file)
+        worker = ArchiverWorker(zip_file_path, self.selectedPaths)
+        self.threadpool.start(worker)
 
 
 if __name__ == '__main__':
