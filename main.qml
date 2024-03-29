@@ -174,7 +174,7 @@ Window {
         icon.color: "red"
         icon.height: 16
         icon.width: 16
-        enabled: archiveProgress === 0 || archiveProgress === 100
+        visible: selectedFiles.length > 0 && (archiveProgress === 0 || archiveProgress === 100)
         onClicked: {
             backend.clear();
         }
