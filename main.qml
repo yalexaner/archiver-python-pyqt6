@@ -114,6 +114,7 @@ Window {
         text: "Select File"
         icon.source: "icons/file.svg"
         icon.color: "green"
+        enabled: archiveProgress === 0 || archiveProgress === 100
         onClicked: {
             backend.open_file_dialog();
         }
@@ -133,6 +134,7 @@ Window {
         text: "Select Directory"
         icon.source: "icons/folder.svg"
         icon.color: "green"
+        enabled: archiveProgress === 0 || archiveProgress === 100
         onClicked: {
             backend.open_dir_dialog();
         }
@@ -152,7 +154,7 @@ Window {
         text: "Archive all Selected"
         icon.source: "icons/archive.svg"
         icon.color: "green"
-        enabled: selectedFiles.length > 0
+        enabled: selectedFiles.length > 0 && (archiveProgress === 0 || archiveProgress === 100)
         onClicked: {
             backend.archive_files();
         }
@@ -172,6 +174,7 @@ Window {
         icon.color: "red"
         icon.height: 16
         icon.width: 16
+        enabled: archiveProgress === 0 || archiveProgress === 100
         onClicked: {
             backend.clear();
         }
