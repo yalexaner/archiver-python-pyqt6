@@ -15,6 +15,7 @@ Window {
     property var selectedFiles: []
     property var archiveProgress: 0
     property var archiveFileName: ""
+    property var unzipStatusText: ""
 
     Connections {
         target: backend
@@ -38,6 +39,12 @@ Window {
         function onArchiveFileName(fileName) {
             // noinspection JSUndeclaredVariable
             archiveFileName = fileName
+        }
+
+        // noinspection JSUnusedGlobalSymbols
+        function onUnzipStatus(status) {
+            // noinspection JSUndeclaredVariable
+            unzipStatusText = status
         }
     }
 
@@ -158,6 +165,37 @@ Window {
         onClicked: {
             backend.archive_files();
         }
+    }
+
+    RoundButton {
+        id: unzipButton
+        anchors.top: archiveButton.bottom
+        anchors.left: archiveButton.left
+        anchors.right: selectFileButton.right
+        radius: 14
+        font.pixelSize: 16
+        topPadding: 8
+        bottomPadding: 8
+        leftPadding: 16
+        rightPadding: 16
+        anchors.topMargin: 8
+        text: "Select .zip file and unzip"
+        icon.source: "icons/archive.svg"
+        icon.color: "green"
+        onClicked: {
+            backend.unzip();
+        }
+    }
+
+    Text {
+        id: unzipStatus
+        anchors.top: unzipButton.bottom
+        anchors.left: unzipButton.left
+        anchors.right: unzipButton.right
+        text: unzipStatusText
+        font.pixelSize: 16
+        horizontalAlignment: Text.AlignHCenter
+        visible: unzipStatusText !== ""
     }
 
     Button {

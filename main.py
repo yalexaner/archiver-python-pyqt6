@@ -7,6 +7,7 @@ from PyQt6.QtQml import QQmlApplicationEngine
 from PyQt6.QtWidgets import QApplication, QFileDialog
 
 from archiver.archive_worker import ArchiverWorker
+from archiver.unarchiver_worker import UnzipWorker
 
 
 class Backend(QObject):
@@ -17,6 +18,8 @@ class Backend(QObject):
 
     archiveProgress = pyqtSignal(float)
     archiveFileName = pyqtSignal(str)
+
+    unzipStatus = pyqtSignal(str)
 
     @pyqtSlot()
     def open_file_dialog(self):
@@ -59,6 +62,21 @@ class Backend(QObject):
         self.archiveFileName.emit(zip_file_path)
 
         worker = ArchiverWorker(zip_file_path, self.selectedPaths, self.archiveProgress)
+        self.threadpool.start(worker)
+
+    @pyqtSlot()
+    def unzip(self):
+        dialog = QFileDialog()
+        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
+        dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+        dialog.setViewMode(QFileDialog.ViewMode.List)
+
+        zip_file_path, _ = dialog.getOpenFileName(None, "Select File", "", "ZIP Files (*.zip)")
+
+        if not zip_file_path:
+            return
+
+        worker = UnzipWorker(zip_file_path, self.unzipStatus)
         self.threadpool.start(worker)
 
 
